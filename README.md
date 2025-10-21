@@ -59,7 +59,7 @@ The application will open in your default web browser at `http://localhost:8501`
 
 ### Navigation
 
-- Use the sidebar navigation buttons to switch between views
+- Use the breadcrumb-style navigation buttons at the top of the page to switch between views
 - Click **🏠 Home** to go to the landing page
 - Click **📊 Reports** to view the reports dashboard
 - Click **⚙️ Settings** to configure preferences
@@ -86,7 +86,8 @@ Each view maintains its own state:
 
 The layout component provides a consistent structure across all pages:
 - **Header**: Application title and description
-- **Sidebar**: Navigation menu and additional information
+- **Breadcrumb Navigation**: Horizontal navigation buttons below the header
+- **Sidebar**: Additional information and about section
 - **Main Content**: Swappable area for view rendering
 - **Footer**: Application footer
 

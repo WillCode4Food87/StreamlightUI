@@ -19,14 +19,40 @@ def render_header() -> None:
     )
 
 
-def render_sidebar() -> None:
-    """Render the navigation sidebar."""
-    with st.sidebar:
-        st.markdown("### 📋 Navigation")
-        
-        current_page = router.get_current_page()
-        
-        # Navigation buttons
+def render_breadcrumb_navigation() -> None:
+    """Render vertical breadcrumb-style navigation below the header."""
+    current_page = router.get_current_page()
+    
+    # Create a container for the breadcrumb navigation
+    st.markdown(
+        """
+        <style>
+        .breadcrumb-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid #2d3748;
+            margin-bottom: 1.5rem;
+        }
+        .breadcrumb-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+        .breadcrumb-separator {
+            color: #718096;
+            margin: 0 0.5rem;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+    
+    # Create columns for the navigation buttons
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
         if st.button(
             "🏠 Home",
             key="nav-home",
@@ -34,7 +60,8 @@ def render_sidebar() -> None:
             type="primary" if current_page == "home" else "secondary"
         ):
             router.navigate("home")
-        
+    
+    with col2:
         if st.button(
             "📊 Reports",
             key="nav-reports",
@@ -42,7 +69,8 @@ def render_sidebar() -> None:
             type="primary" if current_page == "reports" else "secondary"
         ):
             router.navigate("reports")
-        
+    
+    with col3:
         if st.button(
             "⚙️ Settings",
             key="nav-settings",
@@ -50,8 +78,11 @@ def render_sidebar() -> None:
             type="primary" if current_page == "settings" else "secondary"
         ):
             router.navigate("settings")
-        
-        st.markdown("---")
+
+
+def render_sidebar() -> None:
+    """Render the sidebar with information."""
+    with st.sidebar:
         st.markdown("### 📖 About")
         st.markdown(
             """
@@ -62,6 +93,7 @@ def render_sidebar() -> None:
             - State preservation
             - Query parameter routing
             - Modular view structure
+            - Breadcrumb-style navigation
             """
         )
 
@@ -83,8 +115,8 @@ def layout(render_main: Callable[[], None]) -> None:
     """Main layout component that wraps all views.
     
     This function provides a consistent layout structure with header, 
-    sidebar, and footer, while accepting a callback to render the 
-    main content area.
+    breadcrumb navigation, sidebar, and footer, while accepting a callback 
+    to render the main content area.
     
     Args:
         render_main: A callable that renders the main content area
@@ -94,6 +126,7 @@ def layout(render_main: Callable[[], None]) -> None:
     
     # Render the fixed components
     render_header()
+    render_breadcrumb_navigation()
     render_sidebar()
     
     # Render the swappable main content
