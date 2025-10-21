@@ -20,36 +20,73 @@ def render_header() -> None:
 
 
 def render_sidebar() -> None:
-    """Render the navigation sidebar."""
+    """Render the vertical breadcrumb-style navigation sidebar."""
     with st.sidebar:
-        st.markdown("### 📋 Navigation")
+        st.markdown("### 📋 Navigation Path")
         
         current_page = router.get_current_page()
         
-        # Navigation buttons
-        if st.button(
-            "🏠 Home",
-            key="nav-home",
-            use_container_width=True,
-            type="primary" if current_page == "home" else "secondary"
-        ):
-            router.navigate("home")
+        # Define navigation structure with hierarchy
+        nav_items = [
+            {"name": "home", "label": "Home", "icon": "🏠", "level": 0},
+            {"name": "reports", "label": "Reports", "icon": "📊", "level": 1},
+            {"name": "settings", "label": "Settings", "icon": "⚙️", "level": 1},
+        ]
         
-        if st.button(
-            "📊 Reports",
-            key="nav-reports",
-            use_container_width=True,
-            type="primary" if current_page == "reports" else "secondary"
-        ):
-            router.navigate("reports")
-        
-        if st.button(
-            "⚙️ Settings",
-            key="nav-settings",
-            use_container_width=True,
-            type="primary" if current_page == "settings" else "secondary"
-        ):
-            router.navigate("settings")
+        # Render breadcrumb-style navigation
+        for i, item in enumerate(nav_items):
+            is_current = current_page == item["name"]
+            is_before_current = False
+            
+            # Check if this item is before the current page in the path
+            for j, check_item in enumerate(nav_items):
+                if check_item["name"] == current_page and j > i:
+                    is_before_current = True
+                    break
+            
+            # Determine styling based on position relative to current page
+            if is_current:
+                # Current page - highlighted
+                style_class = "breadcrumb-current"
+                connector = "└─►"
+            elif is_before_current:
+                # Before current page in path - show as visited
+                style_class = "breadcrumb-visited"
+                connector = "├──"
+            else:
+                # After current page - show as available
+                style_class = "breadcrumb-available"
+                connector = "├──"
+            
+            # Add indentation for hierarchy levels
+            indent = "　" * item["level"]  # Full-width space for alignment
+            
+            # Create the breadcrumb item with visual connector
+            if i == 0:
+                # First item (root) - no connector
+                breadcrumb_label = f"{indent}{item['icon']} {item['label']}"
+            else:
+                # Subsequent items - show connector
+                breadcrumb_label = f"{connector} {item['icon']} {item['label']}"
+            
+            # Render as clickable button with appropriate styling
+            button_type = "primary" if is_current else "secondary"
+            
+            if st.button(
+                breadcrumb_label,
+                key=f"nav-breadcrumb-{item['name']}",
+                use_container_width=True,
+                type=button_type,
+                disabled=is_current
+            ):
+                router.navigate(item["name"])
+            
+            # Add visual path indicator between items
+            if i < len(nav_items) - 1 and not is_current:
+                st.markdown(
+                    '<div style="margin-left: 0px; color: #888; font-size: 1.2em;">│</div>',
+                    unsafe_allow_html=True
+                )
         
         st.markdown("---")
         st.markdown("### 📖 About")
@@ -58,6 +95,7 @@ def render_sidebar() -> None:
             This is a demonstration of an MVC-style layout in Streamlit.
             
             **Features:**
+            - Vertical breadcrumb navigation
             - Reusable layout component
             - State preservation
             - Query parameter routing
