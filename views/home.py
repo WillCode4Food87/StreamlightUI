@@ -24,7 +24,7 @@ def render() -> None:
         
         ### Try the Demo
         
-        Use the sidebar navigation to switch between different views. Your state 
+        Use the breadcrumb navigation at the top to switch between different views. Your state 
         will be preserved when you return to this page!
         """
     )
