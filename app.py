@@ -24,7 +24,7 @@ def main() -> None:
         page_title="Streamlit MVC Demo",
         page_icon="🎯",
         layout="wide",
-        initial_sidebar_state="expanded"
+        initial_sidebar_state="collapsed"
     )
     
     # Register all available routes

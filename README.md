@@ -4,7 +4,7 @@ A proof-of-concept Streamlit application demonstrating an MVC (Model-View-Contro
 
 ## Features
 
-- ✅ **Reusable Layout Component**: Single layout definition with header, sidebar, and footer
+- ✅ **Reusable Layout Component**: Single layout definition with header, horizontal navigation, and footer
 - ✅ **Modular Views**: Independent view modules with typed `render()` functions
 - ✅ **Query Parameter Routing**: Navigate using URLs like `?page=reports`
 - ✅ **State Persistence**: User state preserved across view navigation
@@ -13,7 +13,7 @@ A proof-of-concept Streamlit application demonstrating an MVC (Model-View-Contro
 
 ## Project Structure
 
-```
+```text
 StreamlightUI/
 ├── app.py                    # Main entrypoint
 ├── router.py                 # Routing logic with query params
@@ -35,15 +35,17 @@ StreamlightUI/
 ## Installation
 
 1. Clone the repository:
-```bash
-git clone https://github.com/WillCode4Food87/StreamlightUI.git
-cd StreamlightUI
-```
 
-2. Install dependencies:
-```bash
-pip install streamlit
-```
+    ```bash
+    git clone https://github.com/WillCode4Food87/StreamlightUI.git
+    cd StreamlightUI
+    ```
+
+1. Install dependencies:
+
+    ```bash
+    pip install streamlit
+    ```
 
 ## Running the Application
 
@@ -59,7 +61,7 @@ The application will open in your default web browser at `http://localhost:8501`
 
 ### Navigation
 
-- Use the sidebar navigation buttons to switch between views
+- Use the horizontal navigation bar beneath the header to switch between views
 - Click **🏠 Home** to go to the landing page
 - Click **📊 Reports** to view the reports dashboard
 - Click **⚙️ Settings** to configure preferences
@@ -85,8 +87,10 @@ Each view maintains its own state:
 ### Layout Component (`components/layout.py`)
 
 The layout component provides a consistent structure across all pages:
+
 - **Header**: Application title and description
-- **Sidebar**: Navigation menu and additional information
+- **Horizontal Navigation**: Primary view switching controls
+- **About Panel**: Optional contextual information beneath the nav
 - **Main Content**: Swappable area for view rendering
 - **Footer**: Application footer
 
@@ -95,6 +99,7 @@ The layout accepts a `render_main` callback, allowing any view to be rendered in
 ### Router (`router.py`)
 
 The router manages:
+
 - Route registration (mapping page names to render functions)
 - Query parameter parsing
 - Navigation between views
@@ -103,6 +108,7 @@ The router manages:
 ### State Management (`state.py`)
 
 Utility functions for working with Streamlit's session state:
+
 - `init_state()`: Initialize state variables with defaults
 - `get_state()`: Retrieve state values
 - `set_state()`: Update state values
@@ -131,7 +137,7 @@ Each view is an independent module with a typed `render()` function:
 
 ### No Code Duplication
 
-- Layout code (header, sidebar, footer) is written once in `components/layout.py`
+- Layout code (header, navigation, footer) is written once in `components/layout.py`
 - All views reuse the same layout without duplication
 - Common utilities are centralized in `state.py`
 
@@ -140,29 +146,31 @@ Each view is an independent module with a typed `render()` function:
 ### Adding a New View
 
 1. Create a new file in `views/` (e.g., `views/analytics.py`)
-2. Implement a `render()` function:
+1. Implement a `render()` function:
 
-```python
-def render() -> None:
-    """Render the analytics view."""
-    st.title("📈 Analytics")
-    # Your view code here
-```
+   ```python
+   def render() -> None:
+       """Render the analytics view."""
+       st.title("📈 Analytics")
+       # Your view code here
+   ```
 
-3. Register the route in `app.py`:
+1. Register the route in `app.py`:
 
-```python
-from views import analytics
-router.register("analytics", analytics.render)
-```
+    ```python
+    from views import analytics
+    router.register("analytics", analytics.render)
+    ```
 
-4. Add a navigation button in `components/layout.py` sidebar
+1. Add a navigation button in the horizontal navigation bar inside `components/layout.py`
 
 ### Customizing the Layout
 
 Edit `components/layout.py` to modify:
+
 - Header styling and content
-- Sidebar navigation
+- Horizontal navigation behavior and styling
+- About panel visibility and copy
 - Footer content
 - Overall page structure
 
@@ -189,7 +197,7 @@ set_state("my_variable", new_value)
 - **Type Hints**: All functions include type annotations for better code quality
 - **Caching**: `st.cache_data` is used in reports view to avoid expensive re-computation
 - **Keyboard-Safe IDs**: All widgets have explicit `key` parameters
-- **No Custom CSS/JS**: Uses Streamlit's built-in theming and components only
+- **Minimal Custom CSS**: Inline styles enhance the layout while staying dependency-free
 
 ## License
 

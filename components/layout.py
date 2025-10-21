@@ -4,6 +4,13 @@ import streamlit as st
 from router import router
 
 
+NAV_ITEMS = [
+    {"name": "home", "label": "Home", "icon": "🏠"},
+    {"name": "reports", "label": "Reports", "icon": "📊"},
+    {"name": "settings", "label": "Settings", "icon": "⚙️"},
+]
+
+
 def render_header() -> None:
     """Render the application header."""
     st.markdown(
@@ -19,86 +26,73 @@ def render_header() -> None:
     )
 
 
-def render_sidebar() -> None:
-    """Render the vertical breadcrumb-style navigation sidebar."""
-    with st.sidebar:
-        st.markdown("### 📋 Navigation Path")
-        
-        current_page = router.get_current_page()
-        
-        # Define navigation structure with hierarchy
-        nav_items = [
-            {"name": "home", "label": "Home", "icon": "🏠", "level": 0},
-            {"name": "reports", "label": "Reports", "icon": "📊", "level": 1},
-            {"name": "settings", "label": "Settings", "icon": "⚙️", "level": 1},
-        ]
-        
-        # Render breadcrumb-style navigation
-        for i, item in enumerate(nav_items):
+def render_navigation() -> None:
+    """Render a horizontal navigation bar between header and main content."""
+    current_page = router.get_current_page()
+
+    # Inject lightweight styling to keep the nav visually anchored beneath the header.
+    st.markdown(
+        """
+        <style>
+            .streamlight-horizontal-nav {
+                background-color: #0e1117;
+                border-bottom: 1px solid #1f2129;
+                padding: 0.75rem 0.5rem;
+                margin-bottom: 1.5rem;
+            }
+            .streamlight-horizontal-nav .stButton>button {
+                background-color: #1f232b;
+                border: 1px solid #30343d;
+                color: #fafafa;
+            }
+            .streamlight-horizontal-nav .stButton>button:hover {
+                border-color: #ff4b4b;
+                color: #ff4b4b;
+            }
+            .streamlight-horizontal-nav .stButton>button[kind="primary"] {
+                background: linear-gradient(90deg, #ff4b4b 0%, #ff6f6f 100%);
+                border: none;
+                color: #0e1117;
+            }
+            .streamlight-horizontal-nav .stButton>button[kind="primary"]:hover {
+                opacity: 0.9;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    with st.container():
+        st.markdown('<div class="streamlight-horizontal-nav">', unsafe_allow_html=True)
+
+        columns = st.columns(len(NAV_ITEMS), gap="medium")
+        for column, item in zip(columns, NAV_ITEMS):
             is_current = current_page == item["name"]
-            is_before_current = False
-            
-            # Check if this item is before the current page in the path
-            for j, check_item in enumerate(nav_items):
-                if check_item["name"] == current_page and j > i:
-                    is_before_current = True
-                    break
-            
-            # Determine styling based on position relative to current page
-            if is_current:
-                # Current page - highlighted
-                style_class = "breadcrumb-current"
-                connector = "└─►"
-            elif is_before_current:
-                # Before current page in path - show as visited
-                style_class = "breadcrumb-visited"
-                connector = "├──"
-            else:
-                # After current page - show as available
-                style_class = "breadcrumb-available"
-                connector = "├──"
-            
-            # Add indentation for hierarchy levels
-            indent = "　" * item["level"]  # Full-width space for alignment
-            
-            # Create the breadcrumb item with visual connector
-            if i == 0:
-                # First item (root) - no connector
-                breadcrumb_label = f"{indent}{item['icon']} {item['label']}"
-            else:
-                # Subsequent items - show connector
-                breadcrumb_label = f"{connector} {item['icon']} {item['label']}"
-            
-            # Render as clickable button with appropriate styling
             button_type = "primary" if is_current else "secondary"
-            
-            if st.button(
-                breadcrumb_label,
-                key=f"nav-breadcrumb-{item['name']}",
-                use_container_width=True,
-                type=button_type,
-                disabled=is_current
-            ):
-                router.navigate(item["name"])
-            
-            # Add visual path indicator between items
-            if i < len(nav_items) - 1 and not is_current:
-                st.markdown(
-                    '<div style="margin-left: 0px; color: #888; font-size: 1.2em;">│</div>',
-                    unsafe_allow_html=True
-                )
-        
-        st.markdown("---")
-        st.markdown("### 📖 About")
+
+            with column:
+                if st.button(
+                    f"{item['icon']} {item['label']}",
+                    key=f"nav-horizontal-{item['name']}",
+                    use_container_width=True,
+                    type=button_type,
+                ):
+                    router.navigate(item["name"])
+
+        st.markdown('</div>', unsafe_allow_html=True)
+
+
+def render_about_panel() -> None:
+    """Render an about panel beneath the navigation bar."""
+    with st.expander("About this demo", expanded=False):
         st.markdown(
             """
             This is a demonstration of an MVC-style layout in Streamlit.
-            
+
             **Features:**
-            - Vertical breadcrumb navigation
+            - Horizontal navigation with query-parameter routing
             - Reusable layout component
-            - State preservation
-            - Query parameter routing
+            - State preservation across navigation
             - Modular view structure
             """
         )
@@ -119,25 +113,23 @@ def render_footer() -> None:
 
 def layout(render_main: Callable[[], None]) -> None:
     """Main layout component that wraps all views.
-    
-    This function provides a consistent layout structure with header, 
-    sidebar, and footer, while accepting a callback to render the 
+
+    Provides a consistent layout structure with header, horizontal navigation,
+    optional about panel, and footer while accepting a callback to render the
     main content area.
-    
+
     Args:
         render_main: A callable that renders the main content area
     """
-    # Set page config (must be first Streamlit command)
-    # Note: This is typically done in app.py, but included here for reference
-    
     # Render the fixed components
     render_header()
-    render_sidebar()
-    
+    render_navigation()
+    render_about_panel()
+
     # Render the swappable main content
     st.markdown("<div id='main-content'>", unsafe_allow_html=True)
     render_main()
     st.markdown("</div>", unsafe_allow_html=True)
-    
+
     # Render footer
     render_footer()
